@@ -4,15 +4,10 @@
   <meta charset="UTF-8" />
   <title>Redirigiendo...</title>
   <script>
-    // Redirige inmediatamente a login.html sin mostrar contenido
-    const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
-    if (!usuario) {
-      window.location.href = 'login.html';
-    }
+    // Redirige inmediatamente al login sin mostrar nada del index
+    window.location.replace('login.html');
   </script>
 </head>
 <body>
-  <!-- Si quieres, aquí puedes poner un mensaje mínimo mientras redirige -->
-  <p>Redirigiendo...</p>
 </body>
 </html>
