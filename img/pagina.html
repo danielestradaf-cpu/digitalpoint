@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Print - Tienda</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <style>
+    /* Notificaciones tipo toast */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #1fe93a7e;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 2000;
+    }
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    /* Información de producto */
+    .product-info {
+      font-size: 0.9rem;
+      color: #555;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="img/logo.png" alt="Digital Print Logo">
+    <h1>Digital Print</h1>
+    <button onclick="abrirCarrito()" class="btn-carrito">
+      Mi carrito 
+      <ion-icon name="cart-outline"></ion-icon>
+      <span id="contadorCarrito" class="contador-carrito">0</span>
+    </button>
+  </header>
+
+  <div class="container">
+    <div class="product">
+      <img src="img/pc.jpeg" alt="Laptop HP">
+      <h2>Laptop HP 15</h2>
+      <p>Precio: $2.500.000</p>
+      <p class="product-info">
+        Procesador Intel i5 11ª generación, 16GB RAM, 512GB SSD, pantalla 15.6" Full HD, ideal para trabajo y estudio.
+      </p>
+      <button onclick="addToCart('Laptop HP 15', 2500000)">Agregar al carrito</button>
+      <button onclick="buyNow('Laptop HP 15', 2500000)">Comprar</button>
+    </div>
+
+    <div class="product">
+      <img src="img/com.jpeg" alt="Laptop Dell">
+      <h2>Laptop Dell Inspiron</h2>
+      <p>Precio: $3.200.000</p>
+      <p class="product-info">
+        Laptop Dell Inspiron con procesador Intel i7, 16GB RAM, 1TB SSD, pantalla 15.6" Full HD, excelente rendimiento para multitarea.
+      </p>
+      <button onclick="addToCart('Laptop Dell Inspiron', 3200000)">Agregar al carrito</button>
+      <button onclick="buyNow('Laptop Dell Inspiron', 3200000)">Comprar</button>
+    </div>
+
+    <div class="product">
+      <img src="img/ep.jpeg" alt="Impresora Epson">
+      <h2>Impresora Epson EcoTank</h2>
+      <p>Precio: $1.100.000</p>
+      <p class="product-info">
+        Impresora Epson EcoTank de alta eficiencia con sistema de tanque recargable, impresión a color y blanco y negro de bajo costo.
+      </p>
+      <button onclick="addToCart('Impresora Epson EcoTank', 1100000)">Agregar al carrito</button>
+      <button onclick="buyNow('Impresora Epson EcoTank', 1100000)">Comprar</button>
+    </div>
+
+    <div class="product">
+      <img src="img/hp.jpeg" alt="Impresora HP">
+      <h2>Impresora HP LaserJet</h2>
+      <p>Precio: $1.500.000</p>
+      <p class="product-info">
+        Impresora HP LaserJet monocromo, alta velocidad, ideal para oficina, con conectividad Wi-Fi y capacidad de impresión mensual alta.
+      </p>
+      <button onclick="addToCart('Impresora HP LaserJet', 1500000)">Agregar al carrito</button>
+      <button onclick="buyNow('Impresora HP LaserJet', 1500000)">Comprar</button>
+    </div>
+  </div>
+
+  <!-- Modal Carrito -->
+  <div id="modalCarrito" class="modal">
+    <div class="modal-contenido">
+      <h3>Carrito de Compras</h3>
+      <table id="tablaCarrito">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div style="text-align: right; margin-top: 10px;">
+        <button onclick="showCheckout()">Proceder al Pago</button>
+        <button onclick="cerrarCarrito()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Portal de Pago -->
+  <div id="modalCheckout" class="modal">
+    <div class="modal-contenido">
+      <h2>Portal de Pago</h2>
+      <form id="checkoutForm">
+        <input type="text" id="cardNumber" placeholder="Número de tarjeta" maxlength="16"><br>
+        <input type="text" id="expiryDate" placeholder="Fecha de expiración (MM/AA)" maxlength="5"><br>
+        <input type="text" id="cvv" placeholder="CVV" maxlength="3"><br>
+        <input type="text" id="cardName" placeholder="Nombre del titular"><br>
+        <button type="button" onclick="finishPurchase()">Pagar</button>
+        <button type="button" onclick="cerrarCheckout()">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contenedor de notificaciones -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let cart = [];
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function addToCart(product, price) {
+      cart.push({product, price});
+      updateCart();
+      showToast(`Se agregó ${product} al carrito`);
+    }
+
+    function buyNow(product, price) {
+      cart = [{product, price}]; // reemplaza carrito por este producto
+      updateCart();
+      showCheckout();
+      showToast(`Comprando ${product}`);
+    }
+
+    function removeFromCart(index) {
+      const removed = cart[index].product;
+      cart.splice(index, 1);
+      updateCart();
+      showToast(`${removed} eliminado del carrito`);
+    }
+
+    function clearCart() {
+      cart = [];
+      updateCart();
+      cerrarCheckout();
+      cerrarCarrito();
+      showToast("Gracias por tu compra");
+    }
+
+    function updateCart() {
+      const tablaBody = document.querySelector("#tablaCarrito tbody");
+      tablaBody.innerHTML = '';
+      cart.forEach((item, index) => {
+        tablaBody.innerHTML += `<tr>
+          <td>${item.product}</td>
+          <td>$${item.price.toLocaleString()}</td>
+          <td><button onclick="removeFromCart(${index})">Eliminar</button></td>
+        </tr>`;
+      });
+      document.getElementById('contadorCarrito').textContent = cart.length;
+    }
+
+    function abrirCarrito() {
+      document.getElementById('modalCarrito').style.display = 'flex';
+    }
+
+    function cerrarCarrito() {
+      document.getElementById('modalCarrito').style.display = 'none';
+    }
+
+    function showCheckout() {
+      if(cart.length === 0){
+        alert("Tu carrito está vacío.");
+        return;
+      }
+      document.getElementById('modalCheckout').style.display = 'flex';
+      cerrarCarrito();
+    }
+
+    function cerrarCheckout() {
+      document.getElementById('modalCheckout').style.display = 'none';
+    }
+
+    function finishPurchase() {
+      // Verifica que todos los campos estén llenos
+      const cardNumber = document.getElementById('cardNumber').value.trim();
+      const expiryDate = document.getElementById('expiryDate').value.trim();
+      const cvv = document.getElementById('cvv').value.trim();
+      const cardName = document.getElementById('cardName').value.trim();
+
+      if (!cardNumber || !expiryDate || !cvv || !cardName) {
+        showToast("Completa todos los campos para pagar");
+        return;
+      }
+
+      showToast("¡Gracias por tu compra!");
+      clearCart();
+    }
+  </script>
+</body>
+</html>

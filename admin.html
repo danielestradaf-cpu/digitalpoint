@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Digital Point</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="main-header">
+    <h1>Digital Point - Admin</h1>
+    <nav>
+      <a href="#" onclick="logout()">Cerrar sesión</a>
+    </nav>
+  </header>
+
+  <main class="admin-panel">
+    <section>
+      <h2>Gestión de Productos</h2>
+      <form id="productoForm" onsubmit="return agregarProducto();">
+        <input type="text" id="nombreProducto" placeholder="Nombre del producto" required />
+        <input type="number" id="precioProducto" placeholder="Precio (COP)" required />
+        <select id="categoriaProducto">
+          <option value="portatil">Portátil</option>
+          <option value="impresora">Impresora</option>
+        </select>
+        <!-- Cambio aquí: input file -->
+        <input type="file" id="imgProducto" accept="image/*" />
+        <button class="btn" type="submit">Agregar</button>
+      </form>
+
+      <h3>Inventario</h3>
+      <ul id="lista-productos"></ul>
+    </section>
+
+    <section>
+      <h2>Usuarios</h2>
+      <div id="listaUsuarios"></div>
+    </section>
+  </main>
+
+  <script>
+    function mostrarProductos() {
+      const lista = document.getElementById('lista-productos');
+      const productos = JSON.parse(localStorage.getItem('productos')) || [];
+      if (!lista) return;
+      lista.innerHTML = productos.length === 0 ? '<li>No hay productos.</li>' :
+       productos.map(p=>`<li>${p.nombre} - $${Number(p.precio).toLocaleString('es-CO')} (${p.categoria}) 
+        <button onclick="eliminarProducto(${p.id})">Eliminar</button></li>`).join('');
+    }
+
+    function agregarProducto() {
+      const nombre = document.getElementById('nombreProducto').value.trim();
+      const precio = Number(document.getElementById('precioProducto').value);
+      const categoria = document.getElementById('categoriaProducto').value;
+      const fileInput = document.getElementById('imgProducto');
+      
+      if(!nombre || !precio) { alert('Completa los campos'); return false; }
+
+      const productos = JSON.parse(localStorage.getItem('productos')) || [];
+      const id = productos.length ? (Math.max(...productos.map(p=>p.id))+1) : 1;
+
+      if(fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgData = e.target.result;
+          productos.push({ id, nombre, precio, categoria, img: imgData });
+          localStorage.setItem('productos', JSON.stringify(productos));
+          mostrarProductos();
+          alert('Producto agregado');
+          document.getElementById('productoForm').reset();
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        productos.push({ id, nombre, precio, categoria, img: 'https://via.placeholder.com/220x140' });
+        localStorage.setItem('productos', JSON.stringify(productos));
+        mostrarProductos();
+        alert('Producto agregado');
+        document.getElementById('productoForm').reset();
+      }
+
+      return false;
+    }
+
+    function eliminarProducto(id) {
+      if(!confirm('Eliminar producto?')) return;
+      let productos = JSON.parse(localStorage.getItem('productos')) || [];
+      productos = productos.filter(p => p.id !== id);
+      localStorage.setItem('productos', JSON.stringify(productos));
+      mostrarProductos();
+    }
+
+    function mostrarUsuarios() {
+      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      const cont = document.getElementById('listaUsuarios');
+      if (!cont) return;
+      cont.innerHTML = usuarios.length === 0 ? '<p>No hay usuarios.</p>' :
+        usuarios.map(u => `<div class="usuario-card"><b>${u.nombre}</b> - ${u.correo}</div>`).join('');
+    }
+
+    function logout() {
+      localStorage.removeItem('rol');
+      window.location.href = 'login.html';
+    }
+
+    window.addEventListener('DOMContentLoaded', ()=>{ mostrarProductos(); mostrarUsuarios(); });
+  </script>
+</body>
+</html>

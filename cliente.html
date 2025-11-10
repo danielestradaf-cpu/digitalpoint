@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cliente - Digital Point</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+  <style>
+    /* ==================== CAMBIOS NUEVOS ==================== */
+    .seccion-oculta {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .client-buttons {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .main-header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-left">
+      <img src="img/logo.png" alt="Logo Digital Point">
+      <h1>Digital Point</h1>
+    </div>
+    <nav>
+      <a href="#" onclick="abrirCarrito()">
+        <ion-icon name="cart-outline"></ion-icon> Carrito
+        <span id="contadorCarrito" class="contador-carrito">0</span>
+      </a>
+      <a href="#" onclick="logout()">Cerrar sesión</a>
+    </nav>
+  </header>
+
+  <main class="client-area">
+    <!-- PERFIL -->
+    <section class="perfil-panel">
+      <h2>Mi Perfil</h2>
+      <div id="perfil-info"></div>
+      <button class="btn" onclick="editarPerfil()">Editar perfil</button>
+    </section>
+
+    <!-- CATÁLOGO -->
+    <section class="productos-panel">
+      <h2>Portátiles y Impresoras</h2>
+      <div id="catalogo" class="productos-grid"></div>
+    </section>
+
+    <!-- BOTONES HISTORIAL / FACTURAS -->
+    <div class="client-buttons">
+      <button class="btn" onclick="toggleSeccion('historial-panel')">Historial</button>
+      <button class="btn" onclick="toggleSeccion('facturas-panel')">Facturas</button>
+    </div>
+
+    <!-- HISTORIAL -->
+    <section id="historial-panel" class="historial-panel seccion-oculta">
+      <h2>Historial de Compras</h2>
+      <ul id="lista-compras"></ul>
+    </section>
+
+    <!-- FACTURAS -->
+    <section id="facturas-panel" class="facturas-panel seccion-oculta">
+      <h2>Facturas</h2>
+      <ul id="lista-facturas" class="facturas-lista"></ul>
+    </section>
+  </main>
+
+  <!-- MODAL CARRITO -->
+  <div id="modalCarrito" class="modal">
+    <div class="modal-content">
+      <h3>Carrito de Compras</h3>
+      <table id="tablaCarrito">
+        <thead>
+          <tr><th>Producto</th><th>Precio</th><th></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="actions">
+        <button class="btn" onclick="abrirCheckout()">Proceder al Pago</button>
+        <button class="btn secondary" onclick="cerrarCarrito()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PAGO -->
+  <div id="modalCheckout" class="modal">
+    <div class="modal-content">
+      <h2>Portal de Pago</h2>
+      <form id="checkoutForm">
+        <input type="text" id="cardNumber" placeholder="Número de tarjeta" maxlength="16"><br>
+        <input type="text" id="expiryDate" placeholder="Fecha de expiración (MM/AA)" maxlength="5"><br>
+        <input type="text" id="cvv" placeholder="CVV" maxlength="3"><br>
+        <input type="text" id="cardName" placeholder="Nombre del titular"><br>
+        <div class="actions">
+          <button type="button" class="btn" onclick="pagarCarritoSimulado()">Pagar</button>
+          <button type="button" class="btn secondary" onclick="cerrarCheckout()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <footer>
+    <p>© 2025 Digital Point</p>
+  </footer>
+
+  <script>
+    /* ==================== FUNCIÓN NUEVA ==================== */
+    function toggleSeccion(seccionId) {
+      const seccion = document.getElementById(seccionId);
+      const visible = seccion.style.display === 'block';
+      document.querySelectorAll('.seccion-oculta').forEach(sec => sec.style.display = 'none');
+      if (!visible) seccion.style.display = 'block';
+    }
+
+   
+    if (!localStorage.getItem('productos')) localStorage.setItem('productos', JSON.stringify(productosIniciales));
+
+    /* ==================== PERFIL ==================== */
+    function cargarPerfil() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      if (!usuario) { window.location.href = 'login.html'; return; }
+      document.getElementById('perfil-info').innerHTML =
+        `<p><strong>Nombre:</strong> ${usuario.nombre}</p>
+         <p><strong>Correo:</strong> ${usuario.correo}</p>`;
+      cargarCatalogo();
+      cargarHistorial();
+      cargarFacturas();
+      actualizarContador();
+    }
+
+    function editarPerfil() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      const nuevoNombre = prompt('Nuevo nombre completo:', usuario.nombre);
+      if (!nuevoNombre) return;
+      usuario.nombre = nuevoNombre;
+      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      const idx = usuarios.findIndex(u => u.correo === usuario.correo);
+      if (idx !== -1) usuarios[idx].nombre = nuevoNombre;
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
+      cargarPerfil();
+      mostrarToast('Perfil actualizado');
+    }
+
+    /* ==================== CATÁLOGO ==================== */
+    function cargarCatalogo() {
+      const lista = document.getElementById('catalogo');
+      const productos = JSON.parse(localStorage.getItem('productos')) || [];
+      lista.innerHTML = productos.map(p => `
+        <div class="producto-card">
+          <img src="${p.img}" alt="${p.nombre}" />
+          <h3>${p.nombre}</h3>
+          <p class="price">$${p.precio.toLocaleString('es-CO')}</p>
+          <button class="btn small" onclick="agregarAlCarrito(${p.id})">Agregar al carrito</button>
+        </div>
+      `).join('');
+    }
+
+    /* ==================== CARRITO ==================== */
+    function agregarAlCarrito(id) {
+      const productos = JSON.parse(localStorage.getItem('productos')) || [];
+      const producto = productos.find(p => p.id === id);
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      usuario.carrito = usuario.carrito || [];
+      usuario.carrito.push({ id: producto.id, nombre: producto.nombre, precio: producto.precio });
+      localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
+      actualizarUsuarios(usuario);
+      actualizarContador();
+      mostrarToast(`${producto.nombre} agregado al carrito`);
+    }
+
+    function abrirCarrito() {
+      const modal = document.getElementById('modalCarrito');
+      const tablaBody = document.querySelector('#tablaCarrito tbody');
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      const carrito = usuario?.carrito || [];
+      tablaBody.innerHTML = carrito.map((p, i) => `
+        <tr>
+          <td>${p.nombre}</td>
+          <td>$${p.precio.toLocaleString('es-CO')}</td>
+          <td><button class="btn small secondary" onclick="eliminarDelCarrito(${i})">X</button></td>
+        </tr>`).join('');
+      modal.style.display = 'flex';
+    }
+
+    function cerrarCarrito() {
+      document.getElementById('modalCarrito').style.display = 'none';
+    }
+
+    function eliminarDelCarrito(index) {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      usuario.carrito.splice(index, 1);
+      localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
+      actualizarUsuarios(usuario);
+      abrirCarrito();
+      actualizarContador();
+    }
+
+    function actualizarContador() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      const cant = usuario?.carrito?.length || 0;
+      document.getElementById('contadorCarrito').textContent = cant;
+    }
+
+    /* ==================== PAGO ==================== */
+    function abrirCheckout() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      if (!usuario.carrito || usuario.carrito.length === 0) return alert('Carrito vacío');
+      cerrarCarrito();
+      document.getElementById('modalCheckout').style.display = 'flex';
+    }
+
+    function cerrarCheckout() {
+      document.getElementById('modalCheckout').style.display = 'none';
+    }
+
+    function pagarCarritoSimulado() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      const carrito = usuario.carrito || [];
+      if (carrito.length === 0) return alert('Carrito vacío');
+
+      const total = carrito.reduce((s, i) => s + i.precio, 0);
+      const fecha = new Date().toLocaleString();
+      const factura = {
+        id: Date.now(),
+        cliente: usuario.nombre,
+        correo: usuario.correo,
+        fecha,
+        detalle: carrito,
+        total
+      };
+
+      usuario.facturas = usuario.facturas || [];
+      usuario.facturas.push(factura);
+      usuario.historial = usuario.historial || [];
+      usuario.historial.push({ fecha, tipo: 'Compra', libro: carrito.map(c => c.nombre).join(', '), total });
+      usuario.carrito = [];
+
+      localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
+      actualizarUsuarios(usuario);
+      cerrarCheckout();
+      mostrarToast('Pago realizado con éxito');
+      cargarHistorial();
+      cargarFacturas();
+      actualizarContador();
+    }
+
+    /* ==================== HISTORIAL Y FACTURAS ==================== */
+    function cargarHistorial() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      const lista = document.getElementById('lista-compras');
+      const historial = usuario.historial || [];
+      lista.innerHTML = historial.length === 0
+        ? '<li>No tiene compras aún.</li>'
+        : historial.map(h => `<li>${h.fecha} — ${h.tipo} — ${h.libro} — $${h.total.toLocaleString('es-CO')}</li>`).join('');
+    }
+
+    function cargarFacturas() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      const lista = document.getElementById('lista-facturas');
+      const facturas = usuario.facturas || [];
+      lista.innerHTML = facturas.length === 0
+        ? '<li>No hay facturas.</li>'
+        : facturas.map(f => `
+          <li class="factura-item">
+            <div>
+              <strong>Factura #${f.id}</strong><br>
+              <span>${f.fecha}</span><br>
+              <b>Total:</b> $${f.total.toLocaleString('es-CO')}
+            </div>
+            <button class="btn small" onclick="verFactura(${f.id})">Ver</button>
+          </li>
+        `).join('');
+    }
+
+    function verFactura(id) {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      const f = usuario.facturas.find(x => x.id === id);
+      const detalle = f.detalle.map(d => `${d.nombre} - $${d.precio.toLocaleString('es-CO')}`).join('\n');
+      alert(`Factura #${f.id}\nFecha: ${f.fecha}\nCliente: ${f.cliente}\n\n${detalle}\n\nTotal: $${f.total.toLocaleString('es-CO')}`);
+    }
+
+    /* ==================== UTILIDADES ==================== */
+    function actualizarUsuarios(usuario) {
+      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      const idx = usuarios.findIndex(u => u.correo === usuario.correo);
+      if (idx !== -1) usuarios[idx] = usuario;
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    }
+
+    function mostrarToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function logout() {
+      localStorage.removeItem('usuarioActivo');
+      localStorage.removeItem('rol');
+      window.location.href = 'login.html';
+    }
+
+    window.addEventListener('DOMContentLoaded', cargarPerfil);
+  </script>
+</body>
+</html>
