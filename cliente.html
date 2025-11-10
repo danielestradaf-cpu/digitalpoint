@@ -43,7 +43,8 @@
         <ion-icon name="cart-outline"></ion-icon> Carrito
         <span id="contadorCarrito" class="contador-carrito">0</span>
       </a>
-      <a href="#" onclick="logout()">Cerrar sesión</a>
+     <a href="#" onclick="logout(event)">Cerrar sesión</a>
+
     </nav>
   </header>
 
@@ -313,11 +314,13 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    function logout() {
-      localStorage.removeItem('usuarioActivo');
-      localStorage.removeItem('rol');
-      window.location.href = 'login.html';
-    }
+    function logout(event) {
+  event.preventDefault();
+  localStorage.removeItem('usuarioActivo');
+  localStorage.removeItem('rol');
+  window.location.href = 'login.html';
+}
+
 
     window.addEventListener('DOMContentLoaded', cargarPerfil);
   </script>
