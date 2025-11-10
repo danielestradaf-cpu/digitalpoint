@@ -2,19 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <title>Redirigiendo...</title>
   <script>
-    // Redirige automáticamente a login.html al cargar la página
-    window.addEventListener('load', () => {
+    // Redirige inmediatamente a login.html sin mostrar contenido
+    const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+    if (!usuario) {
       window.location.href = 'login.html';
-    });
+    }
   </script>
 </head>
 <body>
-  <header class="main-header">
-    <nav></nav>
-      <a href="login.html">Iniciar sesión</a>
-      <a href="register.html">Registrarse</a>
-    </nav>
-  </header>
+  <!-- Si quieres, aquí puedes poner un mensaje mínimo mientras redirige -->
+  <p>Redirigiendo...</p>
 </body>
 </html>
