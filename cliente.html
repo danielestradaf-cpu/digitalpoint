@@ -30,6 +30,23 @@
       align-items: center;
       gap: 10px;
     }
+
+    /* TOAST */
+    .toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--success);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 2000;
+}
+.toast.show { opacity: 1; transform: translateY(0); 
+    }
   </style>
 </head>
 <body>
@@ -39,12 +56,11 @@
       <h1>Digital Point</h1>
     </div>
     <nav>
-      <a href="#" onclick="abrirCarrito()">
+      <a href="#" onclick="abrirCarrito(); return false;">
         <ion-icon name="cart-outline"></ion-icon> Carrito
         <span id="contadorCarrito" class="contador-carrito">0</span>
       </a>
-     <a href="#" onclick="logout(event)">Cerrar sesión</a>
-
+      <a href="#" onclick="logout(event)">Cerrar sesión</a>
     </nav>
   </header>
 
@@ -123,20 +139,20 @@
   </footer>
 
   <script>
-    /* ==================== FUNCIÓN NUEVA ==================== */
+   
+    /* ==================== FUNCIONES ==================== */
+
     function toggleSeccion(seccionId) {
       const seccion = document.getElementById(seccionId);
-      const visible = seccion.style.display === 'block';
-      document.querySelectorAll('.seccion-oculta').forEach(sec => sec.style.display = 'none');
-      if (!visible) seccion.style.display = 'block';
+      const todas = document.querySelectorAll('.seccion-oculta');
+      todas.forEach(sec => sec.style.display = 'none');
+      seccion.style.display = 'block';
     }
 
-   
-    if (!localStorage.getItem('productos')) localStorage.setItem('productos', JSON.stringify(productosIniciales));
-
-    /* ==================== PERFIL ==================== */
     function cargarPerfil() {
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      let usuario;
+      try { usuario = JSON.parse(localStorage.getItem('usuarioActivo')); } 
+      catch { usuario = null; }
       if (!usuario) { window.location.href = 'login.html'; return; }
       document.getElementById('perfil-info').innerHTML =
         `<p><strong>Nombre:</strong> ${usuario.nombre}</p>
@@ -148,11 +164,11 @@
     }
 
     function editarPerfil() {
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
       const nuevoNombre = prompt('Nuevo nombre completo:', usuario.nombre);
       if (!nuevoNombre) return;
       usuario.nombre = nuevoNombre;
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
       const idx = usuarios.findIndex(u => u.correo === usuario.correo);
       if (idx !== -1) usuarios[idx].nombre = nuevoNombre;
       localStorage.setItem('usuarios', JSON.stringify(usuarios));
@@ -161,7 +177,6 @@
       mostrarToast('Perfil actualizado');
     }
 
-    /* ==================== CATÁLOGO ==================== */
     function cargarCatalogo() {
       const lista = document.getElementById('catalogo');
       const productos = JSON.parse(localStorage.getItem('productos')) || [];
@@ -175,11 +190,11 @@
       `).join('');
     }
 
-    /* ==================== CARRITO ==================== */
     function agregarAlCarrito(id) {
       const productos = JSON.parse(localStorage.getItem('productos')) || [];
       const producto = productos.find(p => p.id === id);
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      if (!producto) return mostrarToast('Producto no encontrado');
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
       usuario.carrito = usuario.carrito || [];
       usuario.carrito.push({ id: producto.id, nombre: producto.nombre, precio: producto.precio });
       localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
@@ -191,13 +206,13 @@
     function abrirCarrito() {
       const modal = document.getElementById('modalCarrito');
       const tablaBody = document.querySelector('#tablaCarrito tbody');
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
-      const carrito = usuario?.carrito || [];
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
+      const carrito = usuario.carrito || [];
       tablaBody.innerHTML = carrito.map((p, i) => `
         <tr>
           <td>${p.nombre}</td>
           <td>$${p.precio.toLocaleString('es-CO')}</td>
-          <td><button class="btn small secondary" onclick="eliminarDelCarrito(${i})">X</button></td>
+          <td><button class="btn small secondary" onclick="eliminarDelCarrito(${i})" aria-label="Eliminar producto">X</button></td>
         </tr>`).join('');
       modal.style.display = 'flex';
     }
@@ -207,7 +222,8 @@
     }
 
     function eliminarDelCarrito(index) {
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
+      if (!usuario.carrito || !usuario.carrito[index]) return;
       usuario.carrito.splice(index, 1);
       localStorage.setItem('usuarioActivo', JSON.stringify(usuario));
       actualizarUsuarios(usuario);
@@ -216,15 +232,14 @@
     }
 
     function actualizarContador() {
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
-      const cant = usuario?.carrito?.length || 0;
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
+      const cant = usuario.carrito?.length || 0;
       document.getElementById('contadorCarrito').textContent = cant;
     }
 
-    /* ==================== PAGO ==================== */
     function abrirCheckout() {
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
-      if (!usuario.carrito || usuario.carrito.length === 0) return alert('Carrito vacío');
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
+      if (!usuario.carrito || usuario.carrito.length === 0) return mostrarToast('Carrito vacío');
       cerrarCarrito();
       document.getElementById('modalCheckout').style.display = 'flex';
     }
@@ -234,20 +249,13 @@
     }
 
     function pagarCarritoSimulado() {
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
       const carrito = usuario.carrito || [];
-      if (carrito.length === 0) return alert('Carrito vacío');
+      if (carrito.length === 0) return mostrarToast('Carrito vacío');
 
       const total = carrito.reduce((s, i) => s + i.precio, 0);
       const fecha = new Date().toLocaleString();
-      const factura = {
-        id: Date.now(),
-        cliente: usuario.nombre,
-        correo: usuario.correo,
-        fecha,
-        detalle: carrito,
-        total
-      };
+      const factura = { id: Date.now(), cliente: usuario.nombre, correo: usuario.correo, fecha, detalle: carrito, total };
 
       usuario.facturas = usuario.facturas || [];
       usuario.facturas.push(factura);
@@ -264,9 +272,8 @@
       actualizarContador();
     }
 
-    /* ==================== HISTORIAL Y FACTURAS ==================== */
     function cargarHistorial() {
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
       const lista = document.getElementById('lista-compras');
       const historial = usuario.historial || [];
       lista.innerHTML = historial.length === 0
@@ -275,7 +282,7 @@
     }
 
     function cargarFacturas() {
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
       const lista = document.getElementById('lista-facturas');
       const facturas = usuario.facturas || [];
       lista.innerHTML = facturas.length === 0
@@ -293,34 +300,35 @@
     }
 
     function verFactura(id) {
-      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
-      const f = usuario.facturas.find(x => x.id === id);
+      let usuario = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
+      const f = usuario.facturas?.find(x => x.id === id);
+      if (!f) return mostrarToast('Factura no encontrada');
       const detalle = f.detalle.map(d => `${d.nombre} - $${d.precio.toLocaleString('es-CO')}`).join('\n');
       alert(`Factura #${f.id}\nFecha: ${f.fecha}\nCliente: ${f.cliente}\n\n${detalle}\n\nTotal: $${f.total.toLocaleString('es-CO')}`);
     }
 
-    /* ==================== UTILIDADES ==================== */
     function actualizarUsuarios(usuario) {
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
       const idx = usuarios.findIndex(u => u.correo === usuario.correo);
       if (idx !== -1) usuarios[idx] = usuario;
       localStorage.setItem('usuarios', JSON.stringify(usuarios));
     }
 
+    let toastTimeout;
     function mostrarToast(msg) {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     function logout(event) {
-  event.preventDefault();
-  localStorage.removeItem('usuarioActivo');
-  localStorage.removeItem('rol');
-  window.location.href = 'login.html';
-}
-
+      event.preventDefault();
+      localStorage.removeItem('usuarioActivo');
+      localStorage.removeItem('rol');
+      window.location.href = 'login.html';
+    }
 
     window.addEventListener('DOMContentLoaded', cargarPerfil);
   </script>
