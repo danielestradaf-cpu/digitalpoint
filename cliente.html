@@ -143,10 +143,15 @@
     /* ==================== FUNCIONES ==================== */
 
     function toggleSeccion(seccionId) {
-      const seccion = document.getElementById(seccionId);
-      const todas = document.querySelectorAll('.seccion-oculta');
-      todas.forEach(sec => sec.style.display = 'none');
-      seccion.style.display = 'block';
+  const seccion = document.getElementById(seccionId);
+  const todas = document.querySelectorAll('.seccion-oculta');
+  const estaVisible = seccion.style.display === 'block';
+  todas.forEach(sec => sec.style.display = 'none');
+  if (!estaVisible) {
+    seccion.style.display = 'block';
+  }
+
+
     }
 
     function cargarPerfil() {

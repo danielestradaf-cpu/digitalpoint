@@ -461,3 +461,173 @@ body {
   z-index: -1;
   border-radius: 0 0 12px 12px;
 }
+.usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.usuarios-table th,
+.usuarios-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.usuarios-table thead {
+  background: #007bff;
+  color: #fff;
+  font-weight: 600;
+}
+
+.usuarios-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.usuarios-table td {
+  font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .usuarios-table, .usuarios-table thead, .usuarios-table tbody, .usuarios-table th, .usuarios-table td, .usuarios-table tr {
+    display: block;
+  }
+  .usuarios-table thead tr { display: none; }
+  .usuarios-table tbody tr {
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 8px;
+  }
+  .usuarios-table tbody td {
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .usuarios-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #007bff;
+    flex: 1;
+  }
+
+.mostrar-seccion.btn::before {
+  content: "";
+  position: absolute;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255,255,255,0.15);
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.5s ease;
+  border-radius: 12px;
+}
+
+.mostrar-seccion .btn:hover::before {
+  transform: rotate(45deg) scale(1);
+}
+
+.mostrar-seccion .btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+}
+}
+/* ==================== RECUPERAR CONTRASEÑA ==================== */
+.forgot-box {
+  background: var(--white);
+  padding: 36px 32px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 420px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  animation: fadeInUp 0.6s ease;
+}
+
+.forgot-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.2);
+}
+
+.forgot-box h2 {
+  color: var(--accent);
+  margin-bottom: 24px;
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+.forgot-box p {
+  color: var(--muted);
+  margin-bottom: 18px;
+  font-size: 0.95rem;
+}
+
+.forgot-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.forgot-box input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.forgot-box input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 48, 143, 0.25);
+  outline: none;
+}
+
+.forgot-box .btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.forgot-box a {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--accent);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.forgot-box a:hover {
+  color: #0050f0;
+}
+
+/* Animación de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 600px) {
+  .forgot-box {
+    width: 90%;
+    padding: 28px 22px;
+  }
+}
