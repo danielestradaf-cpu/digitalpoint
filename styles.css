@@ -553,61 +553,48 @@ body {
   z-index: -1;
   border-radius: 0 0 12px 12px;
 }
-.usuarios-table {
+
+/* SECCIÓN VENTAS */
+#ventas {
+  display: none; /* Oculta por defecto */
+  margin-top: 20px;
+}
+
+#ventas h2 {
+  margin-bottom: 10px;
+}
+
+#tablaVentas {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 16px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  border-radius: 12px;
-  overflow: hidden;
+  margin-top: 10px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
 }
 
-.usuarios-table th,
-.usuarios-table td {
-  padding: 12px 16px;
+#tablaVentas th,
+#tablaVentas td {
+  border: 1px solid #ddd;
+  padding: 8px;
   text-align: left;
-  border-bottom: 1px solid #eee;
 }
 
-.usuarios-table thead {
-  background: #007bff;
-  color: #fff;
-  font-weight: 600;
+#tablaVentas th {
+  background-color: #4c7bfc;
+  padding: 8px;
 }
 
-.usuarios-table tbody tr:hover {
-  background: #f9f9f9;
+#tablaVentas tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-.usuarios-table td {
-  font-size: 0.95rem;
+#tablaVentas tbody tr:hover {
+  background-color: #f1f1f1;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .usuarios-table, .usuarios-table thead, .usuarios-table tbody, .usuarios-table th, .usuarios-table td, .usuarios-table tr {
-    display: block;
-  }
-  .usuarios-table thead tr { display: none; }
-  .usuarios-table tbody tr {
-    margin-bottom: 12px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 8px;
-  }
-  .usuarios-table tbody td {
-    padding: 6px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-  .usuarios-table tbody td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: #007bff;
-    flex: 1;
-  }
-
+/* Ajustes de botones si los hubiera en la tabla */
+#ventas .btn {
+  padding: 3px 8px;
+  margin: 0 2px;
+  font-size: 12px;
 }
