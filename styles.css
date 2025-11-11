@@ -610,25 +610,4 @@ body {
     flex: 1;
   }
 
-.mostrar-seccion.btn::before {
-  content: "";
-  position: absolute;
-  left: -50%;
-  top: -50%;
-  width: 200%;
-  height: 200%;
-  background: rgba(255,255,255,0.15);
-  transform: rotate(45deg) scale(0);
-  transition: transform 0.5s ease;
-  border-radius: 12px;
-}
-
-.mostrar-seccion .btn:hover::before {
-  transform: rotate(45deg) scale(1);
-}
-
-.mostrar-seccion .btn:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.3);
-}
 }
