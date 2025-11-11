@@ -4,7 +4,7 @@
   --accent: #00308f;
   --white: #ffffff;
   --muted: #6b7280;
-  --success: #4CAF50;
+  --success: #00aa06d2;
   --error: #e74c3c;
   --background: #003296;
   --black: #000000;
@@ -425,7 +425,7 @@ footer {
 /* ==================== FIX INTERACTIVIDAD HEADER ==================== */
 .main-header {
   position: relative;
-  z-index: 2001; /* asegura que quede por encima de capas invisibles */
+  z-index: 2001; 
 }
 
 .modal {
@@ -437,4 +437,27 @@ footer {
 .modal[style*="display: flex"] {
   pointer-events: auto;
   opacity: 1;
+}
+/* ==================== FIJAR BOTONES DE HEADER ==================== */
+
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 3000; 
+}
+
+body {
+  padding-top: 80px; 
+}
+
+.main-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #ffffff, #4c7bfc);
+  opacity: 0.98;
+  z-index: -1;
+  border-radius: 0 0 12px 12px;
 }
