@@ -142,7 +142,6 @@ h1,h2,h3,h4,h5,h6 { margin: 0; }
 }
 
 .login-box, .register-box {
-  
   background: var(--white);
   padding: 36px 32px;
   border-radius: 12px;
@@ -150,7 +149,6 @@ h1,h2,h3,h4,h5,h6 { margin: 0; }
   width: 100%;
   max-width: 400px;
   transition: transform 0.3s ease;
-  
 }
 .login-box:hover, .register-box:hover { transform: translateY(-3px); }
 
@@ -419,98 +417,24 @@ footer {
 }
 .login-logo {
   display: block;
-  margin: 0 auto 20px auto; /* Centra el logo y separa del h2 */
-  width: 220px;              /* Ajusta el tamaño */
+  margin: 0 auto 20px auto;
+  width: 220px;
   height: auto;
 }
-/* ==================== RECUPERAR CONTRASEÑA ==================== */
-.forgot-box {
-  background: var(--white);
-  padding: 36px 32px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  width: 100%;
-  max-width: 420px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-align: center;
-  animation: fadeInUp 0.6s ease;
+
+/* ==================== FIX INTERACTIVIDAD HEADER ==================== */
+.main-header {
+  position: relative;
+  z-index: 2001; /* asegura que quede por encima de capas invisibles */
 }
 
-.forgot-box:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.2);
+.modal {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.forgot-box h2 {
-  color: var(--accent);
-  margin-bottom: 24px;
-  font-weight: 700;
-  font-size: 1.6rem;
-}
-
-.forgot-box p {
-  color: var(--muted);
-  margin-bottom: 18px;
-  font-size: 0.95rem;
-}
-
-.forgot-box form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
-}
-
-.forgot-box input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border 0.3s ease, box-shadow 0.3s ease;
-}
-
-.forgot-box input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(0, 48, 143, 0.25);
-  outline: none;
-}
-
-.forgot-box .btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.forgot-box a {
-  display: inline-block;
-  margin-top: 10px;
-  color: var(--accent);
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.forgot-box a:hover {
-  color: #0050f0;
-}
-
-/* Animación de entrada */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ==================== RESPONSIVE ==================== */
-@media (max-width: 600px) {
-  .forgot-box {
-    width: 90%;
-    padding: 28px 22px;
-  }
+.modal[style*="display: flex"] {
+  pointer-events: auto;
+  opacity: 1;
 }
