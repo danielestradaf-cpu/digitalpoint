@@ -138,7 +138,10 @@ h1,h2,h3,h4,h5,h6 { margin: 0; }
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(180deg, #003296 0%, #001f75 100%);
+  background: linear-gradient(-45deg, #003296, #001f75, #0024c4, #0050f0);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+
 }
 
 .login-box, .register-box {
@@ -323,6 +326,7 @@ footer {
   width: 90%;
   max-width: 1100px;
   margin: 28px auto;
+
   padding: 22px;
   border-radius: 12px;
   background: var(--white);
@@ -331,7 +335,7 @@ footer {
 }
 .admin-panel:hover { transform: translateY(-2px); }
 .admin-panel h2 { text-align: center; margin-bottom: 24px; color: var(--accent); }
-.admin-panel form { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+.admin-panel form { display: flex; flex-direction: column;  gap: 16px; margin-bottom: 24px; }
 .admin-panel input, .admin-panel select, .admin-panel button {
   padding: 12px 14px;
   border-radius: 8px;
@@ -556,7 +560,7 @@ body {
 
 /* SECCIÓN VENTAS */
 #ventas {
-  display: none; /* Oculta por defecto */
+  display: none; 
   margin-top: 20px;
 }
 
@@ -564,32 +568,55 @@ body {
   margin-bottom: 10px;
 }
 
-#tablaVentas {
+/* === ESTILOS DE TABLAS === */
+.admin-panel table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
+  border-collapse: separate; /* permite border-radius */
+  border-spacing: 0;
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  font-size: 0.95rem;
 }
 
-#tablaVentas th,
-#tablaVentas td {
-  border: 1px solid #ddd;
-  padding: 8px;
+.admin-panel th, 
+.admin-panel td {
+  padding: 14px 16px;
   text-align: left;
 }
 
-#tablaVentas th {
-  background-color: #4c7bfc;
-  padding: 8px;
+.admin-panel thead {
+  background: var(--accent);
+  color: #fff;
 }
 
-#tablaVentas tbody tr:nth-child(even) {
+.admin-panel tbody tr:nth-child(even) {
   background-color: #f9f9f9;
 }
 
-#tablaVentas tbody tr:hover {
-  background-color: #f1f1f1;
+.admin-panel tbody tr:hover {
+  background-color: rgba(0, 48, 143, 0.06);
+  transition: background 0.2s ease;
+}
+
+/* Bordes redondeados superiores e inferiores */
+.admin-panel thead tr:first-child th:first-child {
+  border-top-left-radius: 12px;
+}
+.admin-panel thead tr:first-child th:last-child {
+  border-top-right-radius: 12px;
+}
+.admin-panel tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 12px;
+}
+.admin-panel tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 12px;
+}
+
+/* Alineación y espaciado */
+#tablaVentas {
+  margin-top: 20px;
 }
 
 /* Ajustes de botones si los hubiera en la tabla */
@@ -597,4 +624,23 @@ body {
   padding: 3px 8px;
   margin: 0 2px;
   font-size: 12px;
+}
+/* ==================== inventario ==================== */
+#lista-productos li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+#lista-productos img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }

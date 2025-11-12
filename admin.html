@@ -73,12 +73,26 @@
 
     // PRODUCTOS
     function mostrarProductos() {
-      const lista = document.getElementById('lista-productos');
-      const productos = JSON.parse(localStorage.getItem('productos')) || [];
-      lista.innerHTML = productos.length === 0 ? '<li>No hay productos.</li>' :
-        productos.map(p => `
-          <li>${p.nombre} - $${p.precio.toLocaleString('es-CO')} (${p.categoria}) 
-          <button onclick="eliminarProducto(${p.id})">Eliminar</button></li>`).join('');
+  const lista = document.getElementById('lista-productos');
+  const productos = JSON.parse(localStorage.getItem('productos')) || [];
+
+  if (productos.length === 0) {
+    lista.innerHTML = '<li>No hay productos.</li>';
+    return;
+  }
+
+  lista.innerHTML = productos.map(p => `
+    <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px; background: #f9f9f9; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08);">
+      <img src="${p.img}" alt="${p.nombre}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
+      <div>
+        <strong>${p.nombre}</strong><br>
+        $${p.precio.toLocaleString('es-CO')}<br>
+        <em>${p.categoria}</em><br>
+        <button onclick="eliminarProducto(${p.id})" class="btn">Eliminar</button>
+      </div>
+    </li>
+  `).join('');
+
     }
 
     function agregarProducto() {
@@ -128,8 +142,7 @@
       usuarios.forEach(u => {
         if (u.historial?.length) {
           u.historial.forEach(h => {
-            // Aquí asumimos que h.tipo === 'Compra' y que guardamos los productos en h.libro como string
-            const productos = h.detalle || []; // por seguridad, pero cliente usa carrito para pago
+            const productos = h.detalle || []; 
             if (productos.length) {
               productos.forEach(p => {
                 const tr = document.createElement('tr');
@@ -143,7 +156,6 @@
                 tbody.appendChild(tr);
               });
             } else {
-              // Si no hay detalle, mostramos el libro como string
               const tr = document.createElement('tr');
               tr.innerHTML = `
                 <td>${h.fecha}</td>
